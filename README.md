@@ -34,3 +34,9 @@ Vamos anotar as calls aqui e o que foi debatido
 
 -criacao da struct inicial 
 -distribuicao das funcoes 
+
+
+16/01
+
+-leitura  da documentação
+-ideais iniciais
