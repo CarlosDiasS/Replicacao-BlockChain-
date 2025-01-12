@@ -24,7 +24,7 @@ https://docs.openssl.org/master/man7/ossl-guide-libcrypto-introduction/#using-al
 ---------------------------------------------------------------------------------------------
 Vamos anotar as calls aqui e o que foi debatido 
 
-16/01
+09/01
 
 -leitura da documentacao
 -ideias iniciais
