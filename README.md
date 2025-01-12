@@ -17,3 +17,20 @@ https://docs.openssl.org/master/man7/ossl-guide-libcrypto-introduction/#using-al
 
 -Ao que for fazer a transacao, ira usar a biblioteca pra codificar o texto em um hash
 -Ao que desenvolver o proof of work, ira usar para manipular a geracao do hash 
+
+
+
+
+---------------------------------------------------------------------------------------------
+Vamos anotar as calls aqui e o que foi debatido 
+
+16/01
+
+-leitura da documentacao
+-ideias iniciais
+
+
+12/01 
+
+-criacao da struct inicial 
+-distribuicao das funcoes 
