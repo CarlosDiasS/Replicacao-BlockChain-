@@ -1,9 +1,10 @@
-{
-  "configurations": [
+{   "configurations": [
     {
       "name": "windows-gcc-x86",
       "includePath": [
-        "${workspaceFolder}/**"
+        "${workspaceFolder}/**",
+        "C:/Program Files/OpenSSL-Win64/bin",  
+        "C:/MinGW/include"
       ],
       "compilerPath": "C:/MinGW/bin/gcc.exe",
       "cStandard": "${default}",
