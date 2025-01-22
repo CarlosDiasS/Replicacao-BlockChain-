@@ -10,6 +10,8 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
+#define HASH_SIZE 32 // 32 Bytes
+
 typedef struct MerkleNode {
     //char hash[HASH_SIZE + 1]; // Hash do nó
     struct MerkleNode* left;  // Filho esquerdo
@@ -18,17 +20,12 @@ typedef struct MerkleNode {
 } MerkleNode;
 
 
-
-
-
-
-
 typedef struct chain{
 
 int indice;
 time_t timestamp;
-char hashChainAtual[65]; // 64 caracteres + o '/n'
-char hashChainAnterior[65]; // 64 caracteres + o '/n'
+unsigned char hashChainAtual[HASH_SIZE + 1] ; // 32 caracteres + o '/n'
+unsigned char hashChainAnterior[HASH_SIZE + 1]; // 32 caracteres + o '/n'
 long nonceAtual;
 // adicionar o ponteiro para a cabeca da merkleTree
 
