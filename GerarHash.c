@@ -1,6 +1,9 @@
 #include "StructChain.h"
 #include <openssl/evp.h>
 
+//ISSO É UM PONTO C APENAS PARA TESTE ISOLADO DA FUNÇÃO GERARHASH, A FUNÇÃO ESTÁ NO .H 
+
+
 /*
 @brief faz o calculo do hash usando a biblioteca openSsl
 @param Chain block

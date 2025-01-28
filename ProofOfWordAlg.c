@@ -1,74 +1,78 @@
-// .c do cadu
 #include "StructChain.h"
-#include <openssl/evp.h>
 
 
-
-
-
-// funcao para calcular um hash a partir da struct
-
-// criar tres subfuncoes para definir dificulade(aumentar complexidade da logica)
-
+//ISSO É UM PONTO C APENAS PARA TESTE ISOLADO DA FUNÇÃO POW, A FUNÇÃO ESTÁ NO .H 
 
 
 /*
 @brief Com base na dificuldade, realiza a mineração do nounce especifico, a fim de alterar o hash
-@param Chain block
-@param int dificuldade
+@param bloco: struct para o POW
+@param dificuldade: de 1 a 4
 
 */
-char ProofOfWork(Chain *block, int dificuldade)
+unsigned char ProofOfWork(Chain *bloco, int dificuldade)
 {
+    if(dificuldade < 1 || dificuldade > MAX_SEVERIDADE){
+        printf("dificuldade invalida: %d\n", dificuldade);
+        exit(1);
+    }
 
-    char *hash;
-    char severidade[4];
+    //tamanho definido
+    char severidade[MAX_SEVERIDADE] = {0};
 
-    if (dificuldade == 1)
-    {
-        // um zero no inicio do hash
-        severidade[0] = '0';
+    //cria uma substring de acordo com a dificuldade
+    for(int i=0;i<dificuldade;i++){
+        severidade[i] = '0';
+    }
+    
+    //finaliza a substring com o \0
+    severidade[dificuldade] = '\0';
 
-        // fazer um for para preencher o vetor de severidade, ao inves de 4 if
-        // uma comparação dentro do while com a subString severidade
+    //hash binario 
+    unsigned char hash[HASH_SIZE];
 
-        while (1)
-        {
+    //em tamanho hexadecimal(64 bytes)
+    char hexHash[HASH_SIZE*2 +1];
 
-            hash = GerarHashNode(block);
+    int iteracoes = 0;
 
-            // comparar o hash gerado com o inicio da severidade
-            if (strcmp(hash[0], severidade[0]))
-            {
-                strcpy(hash, block->hashChainAtual);
-                // printf('hash minerado com sucesso.');
-                return 1;
-            }
-            else
-                block->nonceAtual++;
+    while(1){
+        iteracoes++;
+        GerarHashNode(bloco,hash);
+        
+        HashParaHex(hash, hexHash, HASH_SIZE);
+
+        exibirHash(hash);
+
+
+        if (strncmp(hexHash, severidade, dificuldade) == 0)
+{
+            memcpy(bloco->hashChainAtual, hash, HASH_SIZE);
+            printf("hash minerado com sucesso em %d iterações.\n", iteracoes);
+            return 1;
         }
+
+        bloco->nonceAtual++;
     }
-    if (dificuldade == 2)
-    {
-        // dois zeros no inicio do hash
-    }
-    if (dificuldade == 4)
-    {
-        // tres zeros no inicio do hash
-    }
-    if (dificuldade == 4)
-    {
-        // quatro zeros no inicio do hash
-    }
-    printf("dificuldade invalida: %d", dificuldade);
+
 }
 
-int main(int argc, char const *argv[])
+int main()
 {
-    time_t t = time(NULL);
-    struct tm *local = localtime(&t);
-    // testes
+    //TESTES 
 
-   
+    Chain *bloco = malloc(sizeof(Chain));
+    bloco->indice = 10;
+    bloco->nonceAtual = 2222;
+    bloco->timestamp = 0;
+
+    // memorySet
+    memset(bloco->hashChainAnterior, 0, HASH_SIZE + 1);
+    memset(bloco->hashChainAtual, 0, HASH_SIZE + 1);
+
+    ProofOfWork(bloco,4);
+    exibirHash(bloco->hashChainAtual);
+
+    free(bloco);
     return 0;
 }
