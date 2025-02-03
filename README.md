@@ -20,7 +20,19 @@ https://docs.openssl.org/master/man7/ossl-guide-libcrypto-introduction/#using-al
 -Ao que desenvolver o proof of work, ira usar para manipular a geracao do hash 
 
 
+//objetivo:
+//desenvolver uma aplicação em c que implemente uma blockchain funcional.
 
+
+//cada bloco deve armazenar as transações utilizadas(strings com dados ou infos)
+//merkle tree para transações
+
+//Funções:
+
+//insertTransaction
+//mine
+//Printblock
+//searchtransaction
 
 ---------------------------------------------------------------------------------------------
 Vamos anotar as calls aqui e o que foi debatido 
