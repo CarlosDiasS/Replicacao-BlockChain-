@@ -14,11 +14,17 @@
 
 typedef struct MerkleNode
 {
-    // char hash[HASH_SIZE + 1]; // Hash do nó
-    struct MerkleNode *left;  // Filho esquerdo
-    struct MerkleNode *right; // Filho direito
+    unsigned char hash[HASH_SIZE + 1]; // Hash do nó
+    struct MerkleNode *left;           // Filho esquerdo
+    struct MerkleNode *right;          // Filho direito
     time_t timestampTransacao;
 } MerkleNode;
+
+typedef struct
+{
+    MerkleNode **nodes;
+    int size;
+} NodeList;
 
 typedef struct chain
 {
@@ -56,6 +62,25 @@ void HashParaHex(const unsigned char *hashBin, char *hashHex, size_t tamanhoHash
 @brief Com base na dificuldade, realiza a mineração do nounce especifico, a fim de alterar o hash
 @param bloco: struct para o POW
 @param dificuldade: de 1 a 4
-
 */
 unsigned char ProofOfWorkLinear(Chain *bloco, int dificuldade);
+
+/*
+@brief
+@param
+@param
+*/
+int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1], int indice);
+
+MerkleNode *create_leaf(const char *data);
+
+MerkleNode *create_parent(MerkleNode *left, MerkleNode *right);
+
+NodeList build_merkle_tree(char **transactions, int num_transactions);
+
+void free_merkle_tree(MerkleNode *root);
+
+void print_merkle_tree(MerkleNode *root, int level);
+
+
+int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1], int indice);
