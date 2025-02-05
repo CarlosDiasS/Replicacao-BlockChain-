@@ -228,8 +228,41 @@ int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1
     return 0;
 }
 
+MerkleNode *novoMerkleNode(){
+    MerkleNode *aux = malloc(sizeof(MerkleNode));
+    return aux;
+}
+
+
+Chain *novoBlockChain(int n){
+    Chain *aux[] = malloc(sizeof(Chain)*n);
+    for(int i=0;i<n;i++){
+        aux[i]->timestamp = localtime;
+        aux[i]->indice=i;
+        aux[i]->nonceAtual=0;
+        aux[i]->merkleNode = novoMerkleNode;
+    }
+    return aux;
+}
+
+
+
+
+
+
+
+
+
 int main(int argc, char const *argv[])
 {
-    /* code */
+
+
+
+
+
+
+
+
+
     return 0;
 }
