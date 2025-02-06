@@ -33,7 +33,7 @@ typedef struct chain
     unsigned char hashChainAtual[HASH_SIZE];
     unsigned char hashChainAnterior[HASH_SIZE];
     long nonceAtual;
-    // adicionar o ponteiro para a cabeca da merkleTree
+    MerkleNode *merkleTree;
 
 } Chain;
 

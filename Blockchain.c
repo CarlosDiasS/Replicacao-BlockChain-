@@ -240,10 +240,19 @@ Chain *novoBlockChain(int n){
         aux[i]->timestamp = localtime;
         aux[i]->indice=i;
         aux[i]->nonceAtual=0;
-        aux[i]->merkleNode = novoMerkleNode;
+        aux[i]->merkleTree = novoMerkleNode;
     }
     return aux;
 }
+
+
+
+
+
+
+
+
+
 
 
 
