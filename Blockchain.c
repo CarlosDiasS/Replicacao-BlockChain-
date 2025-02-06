@@ -353,6 +353,8 @@ int main()
     // testar funcao novoBloco
     // testar funcao integridade
 
+    //FALTA: item 5-e, simular ataque e calcular qnt tempo levou para refazer todos os nounces(validando o POW)
+
     Chain *blockChain = novoBlockChain(100);
 
     char *transacoes[] = {"t1", "t2", "t3"};
