@@ -112,7 +112,22 @@ void free_merkle_tree(MerkleNode *root);
 void print_merkle_tree(MerkleNode *root, int level);
 
 
-
+/*
+@brief Instancia uma nova BlockChain, iniciando os campos necessarios de cada bloco
+@param n: Quantidade de blocos 
+*/
 Chain *novoBlockChain(int n);
 
+/*
+@brief Calcula o hash de um char e o retorna por referência 
+@param input: string de entrada
+@param output: string de saida
+*/
 void calculate_hash(const char *input, char *output);
+
+/*
+@brief Exibe os dados de cada bloco da blockChain
+@param blockChain: BlockChain com os blocos
+@param tam: Quantidade de blocos da BlockChain
+*/
+void printBlocos(Chain *blockChain, int tam)
