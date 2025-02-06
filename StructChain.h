@@ -33,7 +33,7 @@ typedef struct chain
     unsigned char hashChainAtual[HASH_SIZE];
     unsigned char hashChainAnterior[HASH_SIZE];
     long nonceAtual;
-    NodeList *merkleTree; 
+    NodeList merkleTree; 
 
 } Chain;
 
@@ -110,6 +110,8 @@ void free_merkle_tree(MerkleNode *root);
 @param level: nível atual na árvore (usado para indentação na exibição)
 */
 void print_merkle_tree(MerkleNode *root, int level);
+
+
 
 Chain *novoBlockChain(int n);
 

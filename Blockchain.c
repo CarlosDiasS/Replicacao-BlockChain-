@@ -3,10 +3,10 @@
 void exibirHash(unsigned char *hash)
 {
 
-    for (int i = 0; i < HASH_SIZE; i++)
-    {
-        printf("%02x", hash[i]);
-    }
+    //em tamanho hexadecimal(64 bytes) + \0
+    char auxHex[HASH_SIZE*2+1];
+    HashParaHex(hash, auxHex,HASH_SIZE);
+    printf("%s", auxHex);
     printf("\n");
 }
 
@@ -63,7 +63,7 @@ unsigned char ProofOfWorkLinear(Chain *bloco, int dificuldade)
     // hash binario(32 bytes)
     unsigned char hash[HASH_SIZE];
 
-    // em tamanho hexadecimal(64 bytes)
+    // em tamanho hexadecimal(64 bytes) + \0
     char hexHash[HASH_SIZE * 2 + 1];
 
     int iteracoes = 0;
@@ -75,7 +75,7 @@ unsigned char ProofOfWorkLinear(Chain *bloco, int dificuldade)
 
         HashParaHex(hash, hexHash, HASH_SIZE);
 
-        exibirHash(hash);
+        //exibirHash(hash);
 
         if (strncmp(hexHash, severidade, dificuldade) == 0)
         {
@@ -87,6 +87,7 @@ unsigned char ProofOfWorkLinear(Chain *bloco, int dificuldade)
         // mineração linear
         bloco->nonceAtual++;
     }
+    
 }
 
 void calculate_hash(const char *input, char *output)
@@ -181,7 +182,7 @@ void print_merkle_tree(MerkleNode *root, int level)
     if (!root)
         return;
     for (int i = 0; i < level; i++)
-        printf("  ");
+        printf(" ");
     printf("%s\n", root->hash);
     print_merkle_tree(root->left, level + 1);
     print_merkle_tree(root->right, level + 1);
@@ -256,17 +257,50 @@ Chain *novoBlockChain(int n)
         aux[i].timestamp = time(NULL);
         aux[i].indice = i;
         aux[i].nonceAtual = 0;
-        aux[i].merkleTree->nodes = NULL;
+        aux[i].merkleTree.nodes = NULL;
         memset(aux[i].hashChainAtual, 0, HASH_SIZE);
         memset(aux[i].hashChainAnterior, 0, HASH_SIZE);
     }
     return aux;
 }
 
+void printBlocos(Chain *blockChain, int tam){
+
+    for(int i=0;i<tam;i++){
+
+        printf("Bloco de indice: %d\n", blockChain[i].indice);
+        printf("Timestamp de criacao: %ld\n", blockChain[i].timestamp);
+        printf("Hash do bloco: ");
+        exibirHash(blockChain[i].hashChainAtual);
+        printf("Hash das transacoes: \n");
+        print_merkle_tree(*blockChain[i].merkleTree.nodes,0);
+        printf("\n");
+    }
+
+}
+
 int main()
 {
 
+    //criacao de uma cadeia de blocos
+    Chain *blockChain = novoBlockChain(100);
 
+    char *transacoes[] = {"t1","t2","t3"};
+
+
+    blockChain[0].merkleTree = build_merkle_tree(transacoes,3);
+    blockChain[0].timestamp = time(NULL);
+    ProofOfWorkLinear(&blockChain[0],4);
+
+    memcpy(blockChain[1].hashChainAnterior,blockChain[0].hashChainAtual,HASH_SIZE);
+
+    char *transacoes2[] = {"t1","t2","t3"};
+
+    blockChain[1].merkleTree = build_merkle_tree(transacoes2,3);
+    blockChain[1].timestamp = time(NULL);
+    ProofOfWorkLinear(&blockChain[1],4);
+
+    printBlocos(blockChain,100);
 
     return 0;
 }
