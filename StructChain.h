@@ -33,7 +33,7 @@ typedef struct chain
     unsigned char hashChainAtual[HASH_SIZE];
     unsigned char hashChainAnterior[HASH_SIZE];
     long nonceAtual;
-    MerkleNode *merkleTree;
+    NodeList *merkleTree; 
 
 } Chain;
 
@@ -66,21 +66,51 @@ void HashParaHex(const unsigned char *hashBin, char *hashHex, size_t tamanhoHash
 unsigned char ProofOfWorkLinear(Chain *bloco, int dificuldade);
 
 /*
-@brief
-@param
-@param
+@brief Verifica se uma transação está incluída na árvore de Merkle e constrói o caminho de prova (proof of inclusion)
+@param no: Nó da árvore de Merkle a ser verificado
+@param incluido: transação que se deseja verificar se está incluída na árvore
+@param proofhash: array de strings que armazenará os hashes do caminho de prova
+@param indice: índice atual no array de proofhash
+@return retorna 1 se a transação estiver incluída na árvore, caso contrário retorna 0
 */
-int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1], int indice);
+int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1], int *indice);
 
+/*
+@brief Cria um nó folha da árvore de Merkle com base nos dados fornecidos
+@param data: dados da transação que serão armazenados no nó folha
+@return Retorna um ponteiro para o nó folha criado
+*/
 MerkleNode *create_leaf(const char *data);
 
+/*
+@brief Cria um nó pai na árvore de Merkle com base nos nós filhos fornecidos
+@param left: nó filho esquerdo
+@param right: nó filho direito
+@return Retorna um ponteiro para o nó pai criado
+*/
 MerkleNode *create_parent(MerkleNode *left, MerkleNode *right);
 
+/*
+@brief Constrói uma árvore de Merkle a partir de uma lista de transações
+@param transactions: array de strings contendo as transações
+@param num_transactions: número de transações no array
+@return Retorna uma estrutura NodeList contendo os nós da árvore de Merkle
+*/
 NodeList build_merkle_tree(char **transactions, int num_transactions);
 
+/*
+@brief Libera a memória alocada para a árvore de Merkle
+@param root: ponteiro para a raiz da árvore de Merkle
+*/
 void free_merkle_tree(MerkleNode *root);
 
+/*
+@brief Exibe a árvore de Merkle de forma hierárquica
+@param root: ponteiro para a raiz da árvore de Merkle
+@param level: nível atual na árvore (usado para indentação na exibição)
+*/
 void print_merkle_tree(MerkleNode *root, int level);
 
+Chain *novoBlockChain(int n);
 
-int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1], int indice);
+void calculate_hash(const char *input, char *output);

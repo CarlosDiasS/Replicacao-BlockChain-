@@ -89,6 +89,19 @@ unsigned char ProofOfWorkLinear(Chain *bloco, int dificuldade)
     }
 }
 
+void calculate_hash(const char *input, char *output)
+{
+    unsigned char digest[SHA256_DIGEST_LENGTH];
+    SHA256((unsigned char *)input, strlen(input), digest);
+
+    // converte o hash para uma string hexadecimal
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    {
+        sprintf(output + (i * 2), "%02x", digest[i]);
+    }
+    output[HASH_SIZE] = '\0'; // finaliza a string
+}
+
 MerkleNode *create_leaf(const char *data)
 {
     MerkleNode *node = (MerkleNode *)malloc(sizeof(MerkleNode));
@@ -174,7 +187,7 @@ void print_merkle_tree(MerkleNode *root, int level)
     print_merkle_tree(root->right, level + 1);
 }
 
-int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1], int indice)
+int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1], int *indice)
 {
     // em proofhash, temos o tamanho definido pelo tamanho padrão do hash, 32bits vezes 2, para cada char ter espaço +1 para o caracter \0 no fim.
 
@@ -192,14 +205,14 @@ int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1
         if (no->right)
         {
             // copia o hash do no da direita para o indice trabalhado, depois incrementa pro proximo indice.
-            strcpy(proofhash[indice], no->right->hash);
-            (indice)++;
+            strcpy(proofhash[*indice], no->right->hash);
+            (*indice)++;
         }
         else
         {
             // coloca nada, não existe mais a direita, depois incrementa pro proximo indice.
-            strcpy(proofhash[indice], "");
-            (indice)++;
+            strcpy(proofhash[*indice], "");
+            (*indice)++;
         }
         // encontrado na esquerda
         return 1;
@@ -212,13 +225,13 @@ int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1
         if (no->left)
         {
             // copia o hash do no da esquerda para o indice trabalhado, depois incrementa pro proximo indice.
-            strcpy(proofhash[indice], no->left->hash);
+            strcpy(proofhash[*indice], no->left->hash);
             (indice)++;
         }
         else
         {
             // coloca nada, não existe mais a esquerda, depois incrementa pro proximo indice.
-            strcpy(proofhash[indice], "");
+            strcpy(proofhash[*indice], "");
             (indice)++;
         }
         // encontrado na direita
@@ -228,48 +241,30 @@ int poi(MerkleNode *no, const char *incluido, char proofhash[][HASH_SIZE * 2 + 1
     return 0;
 }
 
-MerkleNode *novoMerkleNode(){
-    MerkleNode *aux = malloc(sizeof(MerkleNode));
-    return aux;
-}
+Chain *novoBlockChain(int n)
+{
+    Chain *aux = malloc(sizeof(Chain) * n);
 
+    if (!aux)
+    {
+        printf("Erro ao alocar memoria.");
+        exit(1);
+    }
 
-Chain *novoBlockChain(int n){
-    Chain *aux[] = malloc(sizeof(Chain)*n);
-    for(int i=0;i<n;i++){
-        aux[i]->timestamp = localtime;
-        aux[i]->indice=i;
-        aux[i]->nonceAtual=0;
-        aux[i]->merkleTree = novoMerkleNode;
+    for (int i = 0; i < n; i++)
+    {
+        aux[i].timestamp = time(NULL);
+        aux[i].indice = i;
+        aux[i].nonceAtual = 0;
+        aux[i].merkleTree->nodes = NULL;
+        memset(aux[i].hashChainAtual, 0, HASH_SIZE);
+        memset(aux[i].hashChainAnterior, 0, HASH_SIZE);
     }
     return aux;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-int main(int argc, char const *argv[])
+int main()
 {
-
-
-
-
-
-
 
 
 
