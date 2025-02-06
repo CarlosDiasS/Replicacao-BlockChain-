@@ -33,7 +33,7 @@ typedef struct chain
     unsigned char hashChainAtual[HASH_SIZE];
     unsigned char hashChainAnterior[HASH_SIZE];
     long nonceAtual;
-    NodeList merkleTree; 
+    NodeList merkleTree;
 
 } Chain;
 
@@ -111,15 +111,14 @@ void free_merkle_tree(MerkleNode *root);
 */
 void print_merkle_tree(MerkleNode *root, int level);
 
-
 /*
 @brief Instancia uma nova BlockChain, iniciando os campos necessarios de cada bloco
-@param n: Quantidade de blocos 
+@param n: Quantidade de blocos
 */
 Chain *novoBlockChain(int n);
 
 /*
-@brief Calcula o hash de um char e o retorna por referência 
+@brief Calcula o hash de um char e o retorna por referência
 @param input: string de entrada
 @param output: string de saida
 */
@@ -130,4 +129,15 @@ void calculate_hash(const char *input, char *output);
 @param blockChain: BlockChain com os blocos
 @param tam: Quantidade de blocos da BlockChain
 */
-void printBlocos(Chain *blockChain, int tam)
+void printBlocos(Chain *blockChain, int tam);
+
+/*
+@brief instancia um novo bloco de acordo com os parâmetros
+@param transacoes vetor de strings
+@param qtdTransacoes total de transações
+@param indice posicao na BlockChain
+@param dificuldade 0 - 4
+@param blockChain BlockChain que ira receber o bloco
+@param tam: Quantidade de blocos da BlockChain
+*/
+Chain novoBloco(char **transacoes, int qtdTransacoes, int indice, int dificuldade, Chain *blockChain, int tam);
