@@ -11,6 +11,7 @@
 
 #define HASH_SIZE 32     // 32 Bytes
 #define MAX_SEVERIDADE 4 // Dificuldade
+#define MAX_NUMEROPROOFS 100 // Qauntidade de nos no caminho de prova 
 
 typedef struct MerkleNode
 {

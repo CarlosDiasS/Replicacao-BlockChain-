@@ -265,18 +265,22 @@ Chain *novoBlockChain(int n)
 
 void printBlocos(Chain *blockChain, int tam)
 {
+    //caso a blockChain exista e os nos nao sejam nulos 
     if (blockChain)
     {
         for (int i = 0; i < tam; i++)
         {
-
-            printf("Bloco de indice: %d\n", blockChain[i].indice);
-            printf("Timestamp de criacao: %ld\n", blockChain[i].timestamp);
-            printf("Hash do bloco: ");
-            exibirHash(blockChain[i].hashChainAtual);
-            printf("Hash das transacoes: \n");
-            print_merkle_tree(*blockChain[i].merkleTree.nodes, 0);
-            printf("\n");
+            if(blockChain[i].merkleTree.nodes){
+                printf("Bloco de indice: %d\n", blockChain[i].indice);
+                printf("Timestamp de criacao: %s\n", ctime(&blockChain[i].timestamp));
+                printf("Hash do bloco: ");
+                exibirHash(blockChain[i].hashChainAtual);
+                printf("Hash do bloco anterior: ");
+                exibirHash(blockChain[i].hashChainAnterior);
+                printf("Hash das transacoes: \n");
+                print_merkle_tree(*blockChain[i].merkleTree.nodes, 0);
+                printf("\n");
+            }
         }
     }
     else
@@ -284,6 +288,36 @@ void printBlocos(Chain *blockChain, int tam)
         printf("BlockChain vazia.");
         exit(1);
     }
+}
+
+int verificarIntegridade(Chain *blockChain, int indice, int tam)
+{
+
+    if (indice == 0)
+        return 1;
+
+    Chain aux = blockChain[indice];
+
+    unsigned char reHash[HASH_SIZE];
+    GerarHashNode(&aux, reHash);
+
+    // compara o hash recalculado com o hash armazenado no bloco
+    if (memcmp(aux.hashChainAtual, reHash, HASH_SIZE) != 0)
+    {
+        printf("Tentativa de fraude detectada no bloco %d\n", indice);
+        return 0;
+    }
+
+    // compara o hash anterior do bloco subsequente ao bloco verificado com o seu hash
+    if (indice < tam - 1)
+    {
+        if (memcmp(blockChain[indice + 1].hashChainAnterior, &aux.hashChainAtual, HASH_SIZE) != 0)
+        {
+            printf("Tentativa de fraude detectada entre os blocos %d e %d", indice, indice + 1);
+        }
+    }
+    // integridade confirmada
+    return 1;
 }
 
 Chain novoBloco(char **transacoes, int qtdTransacoes, int indice, int dificuldade, Chain *blockChain, int tam)
@@ -311,46 +345,18 @@ Chain novoBloco(char **transacoes, int qtdTransacoes, int indice, int dificuldad
     if (!verificarIntegridade(blockChain, indice, tam))
     {
         printf("O bloco não será adicionado.");
-        free_merkle_tree(aux.merkleTree);
+        free_merkle_tree(*aux.merkleTree.nodes);
         exit(1);
     }
     return aux;
 }
 
-int verificarIntegridade(Chain *blockChain, int indice, int tam)
-{
 
-    if (indice == 0)
-        return 1;
-
-    Chain aux = blockChain[indice];
-
-    unsigned char reHash[HASH_SIZE];
-    GerarHashNode(aux, reHash);
-
-    // compara o hash recalculado com o hash armazenado no bloco
-    if (memcmp(aux.hashChainAtual, reHash, HASH_SIZE) != 0)
-    {
-        printf("Tentativa de fraude detectada no bloco %d\n", indice);
-        return 0;
-    }
-
-    // compara o hash anterior do bloco subsequente ao bloco verificado com o seu hash
-    if (indice < tam - 1)
-    {
-        if (memcmp(blockChain[indice + 1].hashChainAnterior, aux.hashChainAtual, HASH_SIZE) != 0)
-        {
-            printf("Tentativa de fraude detectada entre os blocos %d e %d", indice, indice + 1);
-        }
-    }
-    // integridade confirmada
-    return 1;
-}
 
 int main()
 {
 
-    // testar funcao novoBloco
+    // testar funcao novoBloco ok 
     // testar funcao integridade
 
     //FALTA: item 5-e, simular ataque e calcular qnt tempo levou para refazer todos os nounces(validando o POW)
@@ -363,13 +369,29 @@ int main()
     blockChain[0].timestamp = time(NULL);
     ProofOfWorkLinear(&blockChain[0], 4);
 
-    memcpy(blockChain[1].hashChainAnterior, blockChain[0].hashChainAtual, HASH_SIZE);
+    memcpy(&blockChain[1].hashChainAnterior, blockChain[0].hashChainAtual, HASH_SIZE);
 
-    char *transacoes2[] = {"t1", "t2", "t3"};
+    //verificar 
+    // int indice = blockChain[0].indice;
+    // char proofHash[MAX_NUMEROPROOFS][HASH_SIZE*2+1];
+    // char *trs = "t2";
+
+    // if(poi(blockChain[0].merkleTree.nodes,trs,proofHash,&indice)){
+    //     printf("A transação %s pertence ao bloco %d", trs, indice);
+    // };
+
+
+    char *transacoes2[] = {"t43", "t22", "t13"};
 
     blockChain[1].merkleTree = build_merkle_tree(transacoes2, 3);
     blockChain[1].timestamp = time(NULL);
     ProofOfWorkLinear(&blockChain[1], 4);
+
+    char *transacoes3[] = {"t88", "t5", "t7"};
+
+    blockChain[2].merkleTree = build_merkle_tree(transacoes3, 3);
+    blockChain[2].timestamp = time(NULL);
+    ProofOfWorkLinear(&blockChain[2], 4);
 
     printBlocos(blockChain, 100);
 
