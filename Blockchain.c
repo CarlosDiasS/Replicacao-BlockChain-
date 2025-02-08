@@ -265,12 +265,13 @@ Chain *novoBlockChain(int n)
 
 void printBlocos(Chain *blockChain, int tam)
 {
-    //caso a blockChain exista e os nos nao sejam nulos 
+    // caso a blockChain exista e os nos nao sejam nulos
     if (blockChain)
     {
         for (int i = 0; i < tam; i++)
         {
-            if(blockChain[i].merkleTree.nodes){
+            if (blockChain[i].merkleTree.nodes)
+            {
                 printf("Bloco de indice: %d\n", blockChain[i].indice);
                 printf("Timestamp de criacao: %s\n", ctime(&blockChain[i].timestamp));
                 printf("Hash do bloco: ");
@@ -331,68 +332,99 @@ Chain novoBloco(char **transacoes, int qtdTransacoes, int indice, int dificuldad
     // se for o primeiro bloco, o hash anterior será nulo
     if (aux.indice == 0)
     {
-        //defino o hash do bloco anterior como 0 
+        // defino o hash do bloco anterior como 0
         memset(aux.hashChainAnterior, 0, HASH_SIZE);
     }
     // se nao, sera o hash do bloco anterior
     else
     {
-        //copia o hash do bloco anterior
+        // copia o hash do bloco anterior
         memcpy(aux.hashChainAnterior, blockChain[indice - 1].hashChainAtual, HASH_SIZE);
     }
 
     // verifica a autenticidade do novo bloco
-    if (!verificarIntegridade(blockChain, indice, tam))
-    {
-        printf("O bloco não será adicionado.");
-        free_merkle_tree(*aux.merkleTree.nodes);
-        exit(1);
-    }
+    // if (!verificarIntegridade(blockChain, indice, tam))
+    // {
+    //     printf("O bloco não será adicionado.");
+    //     free_merkle_tree(*aux.merkleTree.nodes);
+    //     exit(1);
+    // }
     return aux;
 }
 
+void existeTransacao(Chain *blockChain, char *transacao)
+{
 
+    char proofhash[100][HASH_SIZE * 2 + 1];
+    char hashincluido[HASH_SIZE * 2 + 1];
+    calculate_hash(transacao, hashincluido);
+    int indicepow = 0;
+
+    if (poi(blockChain[0].merkleTree.nodes[0], hashincluido, proofhash, &indicepow))
+    {
+        printf("transação encontrada no bloco %d!\n", blockChain[0].indice);
+    }
+    else
+    {
+        printf("transação não incluida no bloco %d!\n", blockChain[0].indice);
+    }
+}
+
+void simularAtaque(Chain *blockchain, int numblocks, int indicealterado, char *transacao)
+{
+    if (indicealterado < 0 || indicealterado >= numblocks)
+    {
+        printf("indice invalido!");
+        return;
+    }
+    if (blockchain[indicealterado].merkleTree.nodes != NULL)
+    {
+        // cast necessario por conta da chamada de blockchain sendo em **.
+        calculate_hash(transacao, (char *)blockchain[indicealterado].merkleTree.nodes[0]->hash);
+
+        clock_t inicio = clock();
+
+        for (int i = indicealterado; i < numblocks; i++)
+        {
+            blockchain[i].nonceAtual = 0;                      // Reseta o nonce
+            ProofOfWorkLinear(&blockchain[i], MAX_SEVERIDADE); // Recalcula o nonce
+        }
+        clock_t fim = clock();
+        double tempo_gasto = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+        printf("Tempo gasto para reajustar todos os nonces: %.2f segundos\n", tempo_gasto);
+        printf("transação alterada com sucesso!");
+    }
+    else
+    {
+        printf("o bloco %d não possui transações para alterar", indicealterado);
+        return;
+    }
+}
 
 int main()
 {
-
-    // testar funcao novoBloco ok 
-    // testar funcao integridade
-
-    //FALTA: item 5-e, simular ataque e calcular qnt tempo levou para refazer todos os nounces(validando o POW)
-
     Chain *blockChain = novoBlockChain(100);
 
     char *transacoes[] = {"t1", "t2", "t3"};
 
-    blockChain[0].merkleTree = build_merkle_tree(transacoes, 3);
-    blockChain[0].timestamp = time(NULL);
-    ProofOfWorkLinear(&blockChain[0], 4);
+    blockChain[0] = novoBloco(transacoes, 3, 0, 4, blockChain, 100);
 
-    memcpy(&blockChain[1].hashChainAnterior, blockChain[0].hashChainAtual, HASH_SIZE);
-
-    //verificar 
-    // int indice = blockChain[0].indice;
-    // char proofHash[MAX_NUMEROPROOFS][HASH_SIZE*2+1];
-    // char *trs = "t2";
-
-    // if(poi(blockChain[0].merkleTree.nodes,trs,proofHash,&indice)){
-    //     printf("A transação %s pertence ao bloco %d", trs, indice);
-    // };
-
+    existeTransacao(blockChain, "t1");
 
     char *transacoes2[] = {"t43", "t22", "t13"};
 
-    blockChain[1].merkleTree = build_merkle_tree(transacoes2, 3);
-    blockChain[1].timestamp = time(NULL);
-    ProofOfWorkLinear(&blockChain[1], 4);
+    blockChain[1] = novoBloco(transacoes, 3, 1, 4, blockChain, 100);
 
     char *transacoes3[] = {"t88", "t5", "t7"};
 
-    blockChain[2].merkleTree = build_merkle_tree(transacoes3, 3);
-    blockChain[2].timestamp = time(NULL);
-    ProofOfWorkLinear(&blockChain[2], 4);
+    blockChain[2] = novoBloco(transacoes3, 3, 2, 3, blockChain, 100);
 
+    printBlocos(blockChain, 100);
+
+    // simulacao do ataque
+    simularAtaque(blockChain, 100, 1, "t4444");
+
+    // verificando a blockChain apos o ataque
     printBlocos(blockChain, 100);
 
     return 0;

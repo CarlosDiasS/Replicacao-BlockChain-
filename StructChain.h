@@ -9,9 +9,9 @@
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 
-#define HASH_SIZE 32     // 32 Bytes
-#define MAX_SEVERIDADE 4 // Dificuldade
-#define MAX_NUMEROPROOFS 100 // Qauntidade de nos no caminho de prova 
+#define HASH_SIZE 32         // 32 Bytes
+#define MAX_SEVERIDADE 4     // Dificuldade
+#define MAX_NUMEROPROOFS 100 // Qauntidade de nos no caminho de prova
 
 typedef struct MerkleNode
 {
@@ -142,3 +142,19 @@ void printBlocos(Chain *blockChain, int tam);
 @param tam: Quantidade de blocos da BlockChain
 */
 Chain novoBloco(char **transacoes, int qtdTransacoes, int indice, int dificuldade, Chain *blockChain, int tam);
+
+/*
+@brief Verifica se uma transacao esta presente em um bloco
+@param blockChain: BlockChain com os blocos
+@param transacao: transacao para pesquisa
+*/
+void existeTransacao(Chain *blockChain, char *transacao);
+
+/*
+@brief Simula um ataque a uma BlockChain
+@param blockChain: BlockChain com os blocos
+@param numblocks: quantidade de blocos
+@param indicealterado: indice que ira receber o ataque
+@param transacao: transacao fraudulenta
+*/
+void simularAtaque(Chain *blockchain, int numblocks, int indicealterado, char *transacao);
